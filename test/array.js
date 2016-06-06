@@ -692,15 +692,15 @@ describe('array', () => {
             ], done);
         });
 
-        it('validates with a custom comparator', (done) => {
+        it('validates with a custom equality comparator', (done) => {
 
             const obj1 = { name: 'obj1', value: 1 };
             const obj2 = { name: 'obj2', value: 2 };
-            const customDeepEqual = function (a, b) {
+            const customComparator = function (a, b) {
 
                 return a.name === b.name || a.value === b.value;
             };
-            const schema = Joi.array().unique(customDeepEqual);
+            const schema = Joi.array().unique(customComparator);
 
             schema.validate([
                 obj1,
@@ -708,22 +708,47 @@ describe('array', () => {
             ], done);
         });
 
-        it('errors if a custom comparator returns false', (done) => {
+        it('errors if a custom equality comparator returns false', (done) => {
 
             const obj1 = { name: 'obj1', value: 1 };
             const obj2 = { name: 'obj2', value: 1 };
-            const customDeepEqual = function (a, b) {
+
+            const customComparator = function (a, b) {
 
                 return a.name === b.name || a.value === b.value;
             };
-            const schema = Joi.array().unique(customDeepEqual);
+            const schema = Joi.array().unique(customComparator);
 
-            const result = schema.validate([
+            const test = schema.validate([
                 obj1,
                 obj2
             ]);
-            const error = result.error ? null : new Error('Using custom comparator on two equivalent objects did not create an error');
+            const errorMessage = 'Using custom comparator on two equivalent objects did not create an error';
+            const error = test.error ? null : new Error(errorMessage);
             done(error);
+        });
+
+        it('provides the default equality comparator function to a custom equality comparator function as a third argument', (done) => {
+
+            const defaultComparatorMissing = 'A default comparator function was not provided to a custom equality comparator function as a third argument';
+            const customComparator = function (a, b, defaultComparator) {
+
+                if (typeof defaultComparator !== 'function') {
+                    return done(new Error(defaultComparatorMissing));
+                }
+                if (typeof a === typeof b && typeof a === 'object') {
+                    return a.name === b.name || a.value === b.value;
+                }
+                return defaultComparator(a, b);
+            };
+
+            const schema = Joi.array().unique(customComparator);
+            const test = schema.validate([
+                { name: 'obj1', value: 1 },
+                { name: 'obj2', value: 2 },
+                'str2'
+            ]);
+            done(test.error);
         });
     });
 
