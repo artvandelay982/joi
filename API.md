@@ -49,7 +49,7 @@
     - [`array.min(limit)`](#arrayminlimit)
     - [`array.max(limit)`](#arraymaxlimit)
     - [`array.length(limit)`](#arraylengthlimit)
-    - [`array.unique(comparator)`](#arrayunique)
+    - [`array.unique(comparator)`](#arrayuniquecomparator)
   - [`boolean`](#boolean)
   - [`binary`](#binary)
     - [`binary.encoding(encoding)`](#binaryencodingencoding)
@@ -752,7 +752,7 @@ Specifies the exact number of items in the array where:
 const schema = Joi.array().length(5);
 ```
 
-#### `array.unique()`
+#### `array.unique(comparator)`
 
 Requires the array values to be unique.
 
@@ -760,6 +760,28 @@ Be aware that a deep equality is performed on elements of the array having a typ
 
 ```js
 const schema = Joi.array().unique();
+```
+
+An optional custom equality comparator may be provided as an argument to unique(). The comparator will receive arguments (a, b, defaultComparator).
+
+The comparator must return true if two elements are considered equal by the comparator (resulting in an array.unique error).
+
+The comparator may return the result of the default comparator by calling defaultComparator(a, b).
+
+```js
+const schema = Joi.array().unique((a, b, defaultComparator) => {
+
+    if (typeof a === typeof b && typeof a === 'object') {
+        return a.name === b.name || a.value === b.value;
+    }
+    return defaultComparator(a, b);
+});
+schema.validate([
+  { name: 'obj1', value: 1 },
+  { name: 'obj2', value: 2 },
+  1,
+  2
+], (err, value) => { });
 ```
 
 ### `boolean`
