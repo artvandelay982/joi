@@ -691,6 +691,40 @@ describe('array', () => {
                 [[true, false], true]
             ], done);
         });
+
+        it('validates with a custom comparator', (done) => {
+
+            const obj1 = { name: 'obj1', value: 1 };
+            const obj2 = { name: 'obj2', value: 2 };
+            const customDeepEqual = function (a, b) {
+
+                return a.name === b.name || a.value === b.value;
+            };
+            const schema = Joi.array().unique(customDeepEqual);
+
+            schema.validate([
+                obj1,
+                obj2
+            ], done);
+        });
+
+        it('errors if a custom comparator returns false', (done) => {
+
+            const obj1 = { name: 'obj1', value: 1 };
+            const obj2 = { name: 'obj2', value: 1 };
+            const customDeepEqual = function (a, b) {
+
+                return a.name === b.name || a.value === b.value;
+            };
+            const schema = Joi.array().unique(customDeepEqual);
+
+            const result = schema.validate([
+                obj1,
+                obj2
+            ]);
+            const error = result.error ? null : new Error('Using custom comparator on two equivalent objects did not create an error');
+            done(error);
+        });
     });
 
     describe('sparse()', () => {
