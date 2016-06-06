@@ -49,7 +49,7 @@
     - [`array.min(limit)`](#arrayminlimit)
     - [`array.max(limit)`](#arraymaxlimit)
     - [`array.length(limit)`](#arraylengthlimit)
-    - [`array.unique()`](#arrayunique)
+    - [`array.unique(comparator)`](#arrayunique)
   - [`boolean`](#boolean)
   - [`binary`](#binary)
     - [`binary.encoding(encoding)`](#binaryencodingencoding)
