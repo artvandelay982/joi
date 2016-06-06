@@ -694,8 +694,6 @@ describe('array', () => {
 
         it('validates with a custom equality comparator', (done) => {
 
-            const obj1 = { name: 'obj1', value: 1 };
-            const obj2 = { name: 'obj2', value: 2 };
             const customComparator = function (a, b) {
 
                 return a.name === b.name || a.value === b.value;
@@ -703,15 +701,12 @@ describe('array', () => {
             const schema = Joi.array().unique(customComparator);
 
             schema.validate([
-                obj1,
-                obj2
+                { name: 'obj1', value: 1 },
+                { name: 'obj2', value: 2 }
             ], done);
         });
 
         it('errors if a custom equality comparator returns false', (done) => {
-
-            const obj1 = { name: 'obj1', value: 1 };
-            const obj2 = { name: 'obj2', value: 1 };
 
             const customComparator = function (a, b) {
 
@@ -720,8 +715,8 @@ describe('array', () => {
             const schema = Joi.array().unique(customComparator);
 
             const test = schema.validate([
-                obj1,
-                obj2
+                { name: 'obj1', value: 1 },
+                { name: 'obj2', value: 1 }
             ]);
             const errorMessage = 'Using custom comparator on two equivalent objects did not create an error';
             const error = test.error ? null : new Error(errorMessage);
